@@ -20,10 +20,14 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "start": "react-scripts build && node server/server",
+    "start": "node server/server",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "react-scripts build",
+    "deploy": "heroku container:push web -a %npm_package_name% && heroku container:release web -a %npm_package_name%",
+    "predeployunix": "react-scripts build",
+    "deployunix": "heroku container:push web -a $npm_package_name && heroku container:release web -a $npm_package_name"
   },
   "eslintConfig": {
     "extends": [
