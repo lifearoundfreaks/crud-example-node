@@ -2,7 +2,7 @@ import { Button, Stack, TextField, CircularProgress } from "@mui/material"
 import { Link, useNavigate } from "react-router-dom"
 import { useState } from "react"
 
-const RegisterForm = () => {
+const LoginForm = () => {
     const [nameOrEmail, setNameOrEmail] = useState("")
     const [password, setPassword] = useState("")
     const [formErrors, setFormErrors] = useState({})
@@ -69,4 +69,4 @@ const RegisterForm = () => {
     </Stack>
 }
 
-export default RegisterForm
+export default LoginForm
