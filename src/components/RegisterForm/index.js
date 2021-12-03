@@ -1,6 +1,15 @@
 import { Button, Stack, TextField, CircularProgress } from "@mui/material"
 import { Link, useNavigate } from "react-router-dom"
 import { useState } from "react"
+import { useSelector, useDispatch } from 'react-redux'
+import {
+    setLoading,
+    setUser,
+    clearUser,
+    selectLoggedUser,
+} from "../LoggedUser/slice"
+import { useClientAPI } from "../../hooks"
+import styles from './styles.module.css'
 
 const RegisterForm = () => {
 
@@ -9,8 +18,12 @@ const RegisterForm = () => {
     const [password, setPassword] = useState("")
     const [passwordRepeat, setPasswordRepeat] = useState("")
     const [formErrors, setFormErrors] = useState({})
-    const [loading, setLoading] = useState(false)
+
+    const { registerUser } = useClientAPI()
+    const user = useSelector(selectLoggedUser)
+
     const navigate = useNavigate()
+    const dispatch = useDispatch()
 
     const initialValidation = () => {
         const formErrors = {}
@@ -28,34 +41,28 @@ const RegisterForm = () => {
 
     const getServerError = (response) => response.errors?.length && response.errors[0]?.message
 
-    const registerUser = () => {
+    const handleClick = () => {
 
         if (initialValidation()) {
-            setLoading(true)
-            fetch('/api/users', {
-                method: 'POST',
-                body: JSON.stringify({
-                    name: name,
-                    email: email,
-                    password: password,
-                    logIn: true,
-                }),
-                headers: { 'Content-Type': 'application/json' },
-            }).then(response => {
-                return response.json()
-            }).then(data => {
-                setLoading(false)
-                if (getServerError(data) === 'name must be unique')
+            dispatch(setLoading())
+            registerUser(name, email, password, true).then(data => {
+                if (getServerError(data) === 'name must be unique') {
                     setFormErrors({ name: "Username already taken." })
-                else if (getServerError(data) === 'email must be unique')
+                    dispatch(clearUser())
+                }
+                else if (getServerError(data) === 'email must be unique') {
                     setFormErrors({ email: "Email already in use." })
-                else
+                    dispatch(clearUser())
+                }
+                else {
+                    dispatch(setUser(data))
                     navigate("/")
+                }
             })
         }
     }
 
-    return loading ? <CircularProgress /> : <Stack
+    return user.loading ? <CircularProgress /> : <Stack
         component="form"
         spacing={2}
     >
@@ -89,9 +96,9 @@ const RegisterForm = () => {
             helperText={formErrors.passwordRepeat}
             value={passwordRepeat}
         />
-        <Stack spacing={2} direction="row" style={{ marginTop: "2em" }}>
-            <Button variant="contained" size="large" onClick={registerUser}>Register</Button>
-            <Link to="/login" style={{ textDecoration: "none" }}><Button
+        <Stack spacing={2} direction="row" className={styles.buttonStack}>
+            <Button variant="contained" size="large" onClick={handleClick}>Register</Button>
+            <Link to="/login" className={styles.linkButton}><Button
                 variant="outlined"
                 size="large"
             >Log in</Button></Link>

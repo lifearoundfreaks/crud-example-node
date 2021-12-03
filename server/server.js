@@ -35,12 +35,7 @@ app.post('/api/session', async (request, response) => {
         response.json({ success: true })
     } else {
         const user = await db.User.findOne({
-            where: {
-                [Op.or]: [
-                    { name: request.body.nameOrEmail },
-                    { email: request.body.nameOrEmail },
-                ],
-            }
+            where: { email: request.body.email },
         })
         if (user === null) {
             response.json({ error: "No such user." })
@@ -48,7 +43,7 @@ app.post('/api/session', async (request, response) => {
             response.json({ error: "Incorrect password." })
         } else {
             request.session.username = user.name
-            response.json({ success: true })
+            response.json({ username: user.name })
         }
     }
 })
@@ -64,7 +59,7 @@ app.post('/api/users', async (request, response) => {
         if (request.body.logIn) {
             request.session.username = request.body.name
         }
-        response.json({ success: true })
+        response.json({ username: request.body.name })
     } catch (error) {
         response.json({ ...error })
     }

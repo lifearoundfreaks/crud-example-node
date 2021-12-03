@@ -1,0 +1,14 @@
+.parentWrapper {
+    display: table;
+    margin: 0 auto;
+    height: 100%;
+}
+
+.middleBox {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.contents {
+    padding: 2em;
+}

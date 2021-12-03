@@ -4,6 +4,6 @@ html, body {
     background-color: #e0e1e7;
 }
 
-#root {
+#root, .App {
     height: 100%;
 }
