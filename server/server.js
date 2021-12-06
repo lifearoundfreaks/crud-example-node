@@ -78,6 +78,60 @@ app.delete('/api/users', async (request, response) => {
     }
 })
 
+app.get('/api/profiles', async (request, response) => {
+    if (!request.session.username) response.json([])
+    try {
+        const user = await db.User.findOne({
+            where: { name: request.session.username },
+            include: db.Profile
+        })
+        response.json(user.Profiles)
+    } catch (error) {
+        response.json([])
+    }
+})
+
+app.post('/api/profiles', async (request, response) => {
+    console.log(request.body)
+    if (!request.session.username) response.json({ success: false })
+    try {
+        const user = await db.User.findOne({
+            where: { name: request.session.username },
+        })
+        await db.Profile.create({ ...request.body, UserId: user.id })
+        response.json({ success: true })
+    } catch (error) {
+        response.json({ ...error })
+    }
+})
+
+app.put('/api/profiles/:id', async (request, response) => {
+    if (!request.session.username) response.json({ success: false })
+    try {
+        const user = await db.User.findOne({
+            where: { name: request.session.username },
+        })
+        await db.Profile.update(
+            { ...request.body, UserId: user.id },
+            { where: { id: request.params.id } }
+        )
+        response.json({ success: true })
+    } catch (error) {
+        response.json({ ...error })
+    }
+})
+
+app.delete('/api/profiles/:id', async (request, response) => {
+    try {
+        await db.Profile.destroy({
+            where: { id: request.params.id }
+        })
+        response.json({ success: true })
+    } catch (error) {
+        response.json({ ...error })
+    }
+})
+
 const port = process.env.PORT || 3000
 app.listen(port, () => {
     console.log(`Listening at http://localhost:${port}`)

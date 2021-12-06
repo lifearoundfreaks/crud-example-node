@@ -1,0 +1,10 @@
+.cardSimpleText {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+
+.cardAction {
+    width: 100%;
+}
