@@ -23,7 +23,10 @@ module.exports = (sequelize, DataTypes) => {
     })
 
     User.associate = models => {
-        User.hasMany(models.Profile)
+        User.hasMany(models.Profile, {
+            onDelete: 'CASCADE',
+            hooks: true, 
+        })
     }
 
     return User

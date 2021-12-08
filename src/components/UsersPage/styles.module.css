@@ -9,7 +9,23 @@
     position: absolute;
 }
 
+.card {
+    height: 100%;
+}
+
+.card > a {
+    text-decoration: none;
+    color: inherit;
+}
+
 .progress {
     height: 75px;
     width: 75px;
+}
+
+.cardSimpleText {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: center;
 }

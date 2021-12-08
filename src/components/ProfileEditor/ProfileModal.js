@@ -23,6 +23,7 @@ const ProfileModal = ({
     setOpen,
     fetchProfiles,
     initial,
+    userId,
 }) => {
 
     const [name, setName] = useState(null)
@@ -71,6 +72,7 @@ const ProfileModal = ({
                     gender || "male",
                     birthdate || Date.now(),
                     city,
+                    userId,
                 )
             promise.then(
                 () => {

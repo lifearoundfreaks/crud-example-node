@@ -11,14 +11,18 @@ const NotLoggedInBox = () => {
     return user.loading ? <CircularProgress /> : <>
         <p className={styles.notLoggedInText}>Currently not logged in.</p>
         <Stack spacing={2} direction="row">
-            <Link to="/register" className={styles.linkButton}><Button
+            <Button
                 variant="contained"
                 size="large"
-            >Register</Button></Link>
-            <Link to="/login" className={styles.linkButton}><Button
+                to="/register"
+                component={Link}
+            >Sign up</Button>
+            <Button
                 variant="outlined"
                 size="large"
-            >Log in</Button></Link>
+                to="/login"
+                component={Link}
+            >Sign in</Button>
         </Stack>
     </>
 }

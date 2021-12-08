@@ -1,4 +1,10 @@
-import { Button, Stack, TextField, CircularProgress } from "@mui/material"
+import {
+    Button,
+    Stack,
+    TextField,
+    CircularProgress,
+    FormControl,
+} from "@mui/material"
 import { Link, useNavigate } from "react-router-dom"
 import { useState } from "react"
 import { useSelector, useDispatch } from 'react-redux'
@@ -9,7 +15,6 @@ import {
     selectLoggedUser,
 } from "../LoggedUser/slice"
 import { useClientAPI } from "../../hooks"
-import styles from './styles.module.css'
 
 const LoginForm = () => {
 
@@ -34,7 +39,7 @@ const LoginForm = () => {
         if (initialValidation()) {
             dispatch(setLoading())
             logIn(email, password).then(data => {
-                if (data.username) {
+                if (data.name) {
                     dispatch(setUser(data))
                     navigate("/")
                 }
@@ -67,13 +72,15 @@ const LoginForm = () => {
             helperText={formErrors.password}
             value={password}
         />
-        <Stack spacing={2} direction="row" className={styles.buttonStack}>
-            <Button variant="contained" size="large" onClick={handleClick}>Log in</Button>
-            <Link to="/register" className={styles.linkButton}><Button
+        <FormControl><Stack spacing={2} direction="row">
+            <Button variant="contained" size="large" onClick={handleClick}>Sign in</Button>
+            <Button
                 variant="outlined"
                 size="large"
-            >Register</Button></Link>
-        </Stack>
+                to="/register"
+                component={Link}
+            >Sign Up</Button>
+        </Stack></FormControl>
     </Stack>
 }
 

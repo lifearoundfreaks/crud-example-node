@@ -1,4 +1,12 @@
-import { Button, Stack, TextField, CircularProgress } from "@mui/material"
+import {
+    Button,
+    Stack,
+    TextField,
+    CircularProgress,
+    FormControl,
+    FormControlLabel,
+    Checkbox,
+} from "@mui/material"
 import { Link, useNavigate } from "react-router-dom"
 import { useState } from "react"
 import { useSelector, useDispatch } from 'react-redux'
@@ -9,7 +17,6 @@ import {
     selectLoggedUser,
 } from "../LoggedUser/slice"
 import { useClientAPI } from "../../hooks"
-import styles from './styles.module.css'
 
 const RegisterForm = () => {
 
@@ -17,6 +24,7 @@ const RegisterForm = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [passwordRepeat, setPasswordRepeat] = useState("")
+    const [isAdmin, setIsAdmin] = useState(false)
     const [formErrors, setFormErrors] = useState({})
 
     const { registerUser } = useClientAPI()
@@ -45,7 +53,7 @@ const RegisterForm = () => {
 
         if (initialValidation()) {
             dispatch(setLoading())
-            registerUser(name, email, password, true).then(data => {
+            registerUser(name, email, password, isAdmin, true).then(data => {
                 if (getServerError(data) === 'name must be unique') {
                     setFormErrors({ name: "Username already taken." })
                     dispatch(clearUser())
@@ -96,13 +104,19 @@ const RegisterForm = () => {
             helperText={formErrors.passwordRepeat}
             value={passwordRepeat}
         />
-        <Stack spacing={2} direction="row" className={styles.buttonStack}>
-            <Button variant="contained" size="large" onClick={handleClick}>Register</Button>
-            <Link to="/login" className={styles.linkButton}><Button
+        <FormControlLabel
+            label="Is admin"
+            control={<Checkbox onChange={event => setIsAdmin(event.target.checked)} />}
+        />
+        <FormControl><Stack spacing={2} direction="row">
+            <Button variant="contained" size="large" onClick={handleClick}>Sign Up</Button>
+            <Button
                 variant="outlined"
                 size="large"
-            >Log in</Button></Link>
-        </Stack>
+                to="/login"
+                component={Link}
+            >Sign in</Button>
+        </Stack></FormControl>
     </Stack>
 }
 

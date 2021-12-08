@@ -26,7 +26,10 @@ app.use(session({
 sequelizeStore.sync()
 
 app.get('/api/session', async (request, response) => {
-    response.json({ username: request.session.username })
+    response.json({
+        name: request.session.username,
+        isAdmin: request.session.isAdmin,
+    })
 })
 
 app.post('/api/session', async (request, response) => {
@@ -43,36 +46,88 @@ app.post('/api/session', async (request, response) => {
             response.json({ error: "Incorrect password." })
         } else {
             request.session.username = user.name
-            response.json({ username: user.name })
+            request.session.isAdmin = user.isAdmin
+            response.json(user)
         }
     }
 })
 
 app.get('/api/users', async (request, response) => {
-    const users = await db.User.findAll()
-    response.json(users)
-})
-
-app.post('/api/users', async (request, response) => {
     try {
-        await db.User.create(request.body)
-        if (request.body.logIn) {
-            request.session.username = request.body.name
-        }
-        response.json({ username: request.body.name })
+        if (!request.session.isAdmin) response.json([])
+        const users = await db.User.findAll({
+            attributes: {
+                include: [[db.Sequelize.fn("COUNT", db.Sequelize.col("Profiles.id")), "profilesCount"]]
+            },
+            include: [{
+                model: db.Profile, attributes: []
+            }],
+            group: ['User.id'],
+        })
+        response.json(users)
     } catch (error) {
         response.json({ ...error })
     }
 })
 
-app.delete('/api/users', async (request, response) => {
+app.get('/api/users/:id/profiles', async (request, response) => {
+    if (!request.session.isAdmin) response.json({ success: false })
+
     try {
-        await db.User.destroy({
-            where: {
-                id: { [Op.or]: request.body.ids }
-            }
+        const user = await db.User.findOne({
+            where: { id: parseInt(request.params.id) },
+            include: [{ model: db.Profile }],
         })
-        response.json({ success: true })
+        response.json(user)
+    } catch (error) {
+        response.json({ ...error })
+    }
+})
+
+app.post('/api/users', async (request, response) => {
+    try {
+        const user = await db.User.create(request.body)
+        if (request.body.logIn) {
+            request.session.username = request.body.name
+            request.session.isAdmin = request.body.isAdmin
+        }
+        response.json(user)
+    } catch (error) {
+        response.json({ ...error })
+    }
+})
+
+app.put('/api/users/:id', async (request, response) => {
+    if (!request.session.isAdmin) response.json({ success: false })
+    try {
+        const user = await db.User.findOne(
+            { where: { id: request.params.id } },
+        )
+        if (user === null) response.json({ success: false })
+        await user.update(request.body)
+        // Log out the user if they change themself
+        if (user.name === request.session.username) {
+            request.session.destroy()
+            response.json({ logOut: true })
+        } else response.json({ success: true })
+    } catch (error) {
+        response.json({ ...error })
+    }
+})
+
+app.delete('/api/users/:id', async (request, response) => {
+    if (!request.session.isAdmin) response.json({ success: false })
+    try {
+        const user = await db.User.findOne({
+            where: { id: request.params.id }
+        })
+        const username = user?.name
+        await user.destroy()
+        // If a user deletes themself we need to log them out
+        if (username === request.session.username) {
+            request.session.destroy()
+            response.json({ logOut: true })
+        } else response.json({ success: true })
     } catch (error) {
         response.json({ ...error })
     }
@@ -92,13 +147,19 @@ app.get('/api/profiles', async (request, response) => {
 })
 
 app.post('/api/profiles', async (request, response) => {
-    console.log(request.body)
     if (!request.session.username) response.json({ success: false })
     try {
+        const { userId, ...profileData } = request.body
+        const queryParams = userId ? { id: userId } : { name: request.session.username }
         const user = await db.User.findOne({
-            where: { name: request.session.username },
+            where: queryParams,
         })
-        await db.Profile.create({ ...request.body, UserId: user.id })
+        if (
+            user === null ||
+            // Only admins are allowed to create profiles for other users
+            ((request.session.username !== user.name) && !request.session.isAdmin)
+        ) response.json({ success: false })
+        await db.Profile.create({ ...profileData, UserId: user.id })
         response.json({ success: true })
     } catch (error) {
         response.json({ ...error })
@@ -107,13 +168,21 @@ app.post('/api/profiles', async (request, response) => {
 
 app.put('/api/profiles/:id', async (request, response) => {
     if (!request.session.username) response.json({ success: false })
+    const queryParams = request.session.isAdmin ? {} : {
+        include: [{
+            model: db.User,
+            where: { name: request.session.username }
+        }]
+    }
     try {
-        const user = await db.User.findOne({
-            where: { name: request.session.username },
-        })
         await db.Profile.update(
-            { ...request.body, UserId: user.id },
-            { where: { id: request.params.id } }
+            request.body,
+            {
+                ...queryParams,
+                where: {
+                    id: request.params.id
+                }
+            }
         )
         response.json({ success: true })
     } catch (error) {
@@ -122,11 +191,44 @@ app.put('/api/profiles/:id', async (request, response) => {
 })
 
 app.delete('/api/profiles/:id', async (request, response) => {
+    const queryParams = request.session.isAdmin ? {} : {
+        include: [{
+            model: db.User,
+            where: { name: request.session.username }
+        }]
+    }
     try {
         await db.Profile.destroy({
-            where: { id: request.params.id }
+            ...queryParams,
+            where: {
+                id: request.params.id,
+            },
         })
         response.json({ success: true })
+    } catch (error) {
+        response.json({ ...error })
+    }
+})
+
+app.get('/api/dashboard', async (request, response) => {
+    if (!request.session.isAdmin) response.json({ success: false })
+    try {
+        const userCount = await db.User.count()
+        const profileCount = await db.Profile.count({ where: { UserId: { [Op.ne]: null } } })
+        const adultBirthdate = new Date(new Date().setFullYear(new Date().getFullYear() - 18))
+        const adultrofileCount = await db.Profile.count({
+            where: {
+                birthdate: {
+                    [Op.lte]: adultBirthdate,
+                },
+                UserId: { [Op.ne]: null },
+            },
+        })
+        response.json({
+            userCount: userCount,
+            profileCount: profileCount,
+            adultrofileCount: adultrofileCount
+        })
     } catch (error) {
         response.json({ ...error })
     }

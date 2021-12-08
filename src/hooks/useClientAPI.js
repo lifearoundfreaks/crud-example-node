@@ -22,12 +22,14 @@ const useClientAPI = () => {
         name,
         email,
         password,
-        logIn=false,
+        isAdmin,
+        logIn = false,
     ) => post(`/${API_ENDPOINT}/users`, {
         name: name,
         email: email,
         password: password,
         logIn: logIn,
+        isAdmin: isAdmin,
     })
 
     const createProfile = (
@@ -35,11 +37,13 @@ const useClientAPI = () => {
         gender,
         birthdate,
         city,
+        userId,
     ) => post(`/${API_ENDPOINT}/profiles`, {
         name: name,
         gender: gender,
         birthdate: birthdate,
         city: city,
+        ...(userId ? { userId } : {}),
     })
 
     const updateProfile = (
@@ -55,9 +59,30 @@ const useClientAPI = () => {
         city: city,
     }, id)
 
+    const updateUser = (
+        id,
+        name,
+        email,
+        isAdmin,
+    ) => put(`/${API_ENDPOINT}/users/`, {
+        name: name,
+        email: email,
+        isAdmin: isAdmin,
+    }, id)
+
     const deleteProfile = id => deleteById(
         `/${API_ENDPOINT}/profiles/`, id
     )
+
+    const deleteUser = id => deleteById(
+        `/${API_ENDPOINT}/users/`, id
+    )
+
+    const getDashboard = () => get(`/${API_ENDPOINT}/dashboard`)
+
+    const getUsers = () => get(`/${API_ENDPOINT}/users`)
+
+    const getUserWithProfiles = id => get(`/${API_ENDPOINT}/users/${id}/profiles`)
 
     return {
         logOut,
@@ -67,7 +92,12 @@ const useClientAPI = () => {
         getProfiles,
         createProfile,
         updateProfile,
+        updateUser,
         deleteProfile,
+        deleteUser,
+        getDashboard,
+        getUsers,
+        getUserWithProfiles,
     }
 }
 

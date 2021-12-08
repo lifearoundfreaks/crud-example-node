@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const loadingUser = {
-    username: undefined,
+    name: undefined,
     loading: true,
     loggedIn: false,
     isAdmin: false,
@@ -9,9 +9,9 @@ const loadingUser = {
 const anonymousUser = { ...loadingUser, loading: false }
 
 const setUserData = (state, userData) => {
-    state.username = userData.username
+    state.username = userData.name
     state.isAdmin = userData.isAdmin || false
-    state.loggedIn = userData.username !== undefined
+    state.loggedIn = userData.name !== undefined
     state.loading = userData.loading || false
 }
 
