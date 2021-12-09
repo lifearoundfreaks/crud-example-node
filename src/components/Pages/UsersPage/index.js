@@ -22,7 +22,7 @@ const UsersPage = () => {
     useEffect(() => getUsers().then(data => {
         setUsersData(data)
         setLoading(false)
-    }), [])
+    }), [getUsers])
 
     return loading ? <div className={style.loadingBox}><CircularProgress className={style.progress} /></div> : <>
         <h1>Users</h1>
@@ -30,7 +30,7 @@ const UsersPage = () => {
             {usersData.map(user => <Grid item xs={6} md={3}><Card className={style.card}>
                 <CardContent
                     component={Link}
-                    to={routePaths.editUser.replace('\:id', user.id)}
+                    to={routePaths.editUser.replace(':id', user.id)}
                 >
                     <Stack spacing={2}>
                         <Typography variant="h5" className={style.cardSimpleText}>

@@ -24,6 +24,7 @@ const EditUserPage = () => {
             setLoading(false)
         })
     }
+    // eslint-disable-next-line
     useEffect(() => fetchProfiles(), [])
 
     return loading ? <div className={style.loadingBox}>

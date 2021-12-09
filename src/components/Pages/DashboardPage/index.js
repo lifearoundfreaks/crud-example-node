@@ -20,7 +20,7 @@ const DashboardPage = () => {
             setDashboardData(data)
             setLoading(false)
         })
-    }, [])
+    }, [getDashboard])
 
     return loading ? <div className={style.loadingBox}><CircularProgress className={style.progress} /></div> : <>
         <h1>Dashboard</h1>
