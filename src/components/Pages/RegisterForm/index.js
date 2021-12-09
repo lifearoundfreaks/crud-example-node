@@ -19,13 +19,22 @@ import {
 import { useClientAPI } from "../../../hooks"
 import { useRoutes } from "../../../hooks/useRoutes"
 
+const REQUIRED_FIELDS = [
+    'name',
+    'email',
+    'password',
+    'passwordRepeat',
+]
+
 const RegisterForm = () => {
 
-    const [name, setName] = useState("")
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [passwordRepeat, setPasswordRepeat] = useState("")
-    const [isAdmin, setIsAdmin] = useState(false)
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        password: "",
+        passwordRepeat: "",
+        isAdmin: false,
+    })
     const [formErrors, setFormErrors] = useState({})
     const { routePaths } = useRoutes()
 
@@ -35,36 +44,49 @@ const RegisterForm = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
+    const setFormValue = (field, value) => setFormData({ ...formData, [field]: value })
+
+    const getPasswordErrors = () => formData.password !== formData.passwordRepeat ? {
+        password: "Passwords do not match.",
+        passwordRepeat: "Passwords do not match.",
+    } : {}
+
+    const gerFieldRequiredErrors = () => Object.fromEntries(REQUIRED_FIELDS.filter(
+        requiredField => !formData[requiredField]
+    ).map(requiredField => [
+        requiredField, "This field is required."
+    ]))
+
     const initialValidation = () => {
-        const formErrors = {}
-        if (password !== passwordRepeat) {
-            formErrors.password = "Passwords do not match."
-            formErrors.passwordRepeat = "Passwords do not match."
+        const formErrors = {
+            ...getPasswordErrors(),
+            ...gerFieldRequiredErrors(),
         }
-        if (!name) formErrors.name = "This field is required."
-        if (!email) formErrors.email = "This field is required."
-        if (!password) formErrors.password = "This field is required."
-        if (!passwordRepeat) formErrors.passwordRepeat = "This field is required."
         setFormErrors(formErrors)
         return !Object.keys(formErrors).length
     }
 
-    const getServerError = (response) => response.errors?.length && response.errors[0]?.message
+    const getServerErrors = response => ({
+        'name must be unique': { name: "Username already taken." },
+        'email must be unique': { name: "Email already in use." },
+    }[response.errors?.length && response.errors[0].message])
 
     const handleClick = () => {
 
         if (initialValidation()) {
             dispatch(setLoading())
-            registerUser(name, email, password, isAdmin, true).then(data => {
-                if (getServerError(data) === 'name must be unique') {
-                    setFormErrors({ name: "Username already taken." })
+            registerUser(
+                formData.name,
+                formData.email,
+                formData.password,
+                formData.isAdmin,
+                true,
+            ).then(data => {
+                const serverErrors = getServerErrors(data)
+                if (serverErrors) {
+                    setFormErrors(serverErrors)
                     dispatch(clearUser())
-                }
-                else if (getServerError(data) === 'email must be unique') {
-                    setFormErrors({ email: "Email already in use." })
-                    dispatch(clearUser())
-                }
-                else {
+                } else {
                     dispatch(setUser(data))
                     navigate(routePaths.home)
                 }
@@ -78,37 +100,40 @@ const RegisterForm = () => {
     >
         <TextField
             label="Name"
-            onChange={e => setName(e.target.value)}
+            onChange={e => setFormValue("name", e.target.value)}
             error={!!formErrors.name}
             helperText={formErrors.name}
-            value={name}
+            value={formData.name}
         />
         <TextField
             label="Email"
-            onChange={e => setEmail(e.target.value)}
+            onChange={e => setFormValue("email", e.target.value)}
             error={!!formErrors.email}
             helperText={formErrors.email}
-            value={email}
+            value={formData.email}
         />
         <TextField
             label="Password"
             type="password"
-            onChange={e => setPassword(e.target.value)}
+            onChange={e => setFormValue("password", e.target.value)}
             error={!!formErrors.password}
             helperText={formErrors.password}
-            value={password}
+            value={formData.password}
         />
         <TextField
             label="Repeat password"
             type="password"
-            onChange={e => setPasswordRepeat(e.target.value)}
+            onChange={e => setFormValue("passwordRepeat", e.target.value)}
             error={!!formErrors.passwordRepeat}
             helperText={formErrors.passwordRepeat}
-            value={passwordRepeat}
+            value={formData.passwordRepeat}
         />
         <FormControlLabel
             label="Is admin"
-            control={<Checkbox onChange={event => setIsAdmin(event.target.checked)} />}
+            control={<Checkbox
+                checked={formData.isAdmin}
+                onChange={event => setFormValue("isAdmin", event.target.checked)}
+            />}
         />
         <FormControl><Stack spacing={2} direction="row">
             <Button variant="contained" size="large" onClick={handleClick}>Sign Up</Button>

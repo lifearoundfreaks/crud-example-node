@@ -16,6 +16,11 @@ import { clearUser } from "../../CoreFunctionality/LoggedUser/slice"
 import { useRoutes } from "../../../hooks/useRoutes"
 import style from './styles.module.css'
 
+const REQUIRED_FIELDS = [
+    'name',
+    'email',
+]
+
 const EditUserModal = ({
     userData,
     open,
@@ -23,9 +28,11 @@ const EditUserModal = ({
     setLoading,
 }) => {
 
-    const [name, setName] = useState(userData.name)
-    const [email, setEmail] = useState(userData.email)
-    const [isAdmin, setIsAdmin] = useState(userData.isAdmin)
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        isAdmin: false,
+    })
 
     const [formErrors, setFormErrors] = useState({})
 
@@ -35,10 +42,16 @@ const EditUserModal = ({
 
     const { updateUser } = useClientAPI()
 
+    const setFormValue = (field, value) => setFormData({ ...formData, [field]: value })
+
+    const gerFieldRequiredErrors = () => Object.fromEntries(REQUIRED_FIELDS.filter(
+        requiredField => !formData[requiredField]
+    ).map(requiredField => [
+        requiredField, "This field is required."
+    ]))
+
     const initialValidation = () => {
-        const formErrors = {}
-        if (!name) formErrors.name = "This field is required."
-        if (!email) formErrors.city = "This field is required."
+        const formErrors = gerFieldRequiredErrors()
         setFormErrors(formErrors)
         return !Object.keys(formErrors).length
     }
@@ -49,9 +62,9 @@ const EditUserModal = ({
             setLoading(true)
             updateUser(
                 userData.id,
-                name,
-                email,
-                isAdmin,
+                formData.name,
+                formData.email,
+                formData.isAdmin,
             ).then(data => {
                 if (data.logOut) {
                     dispatch(clearUser())
@@ -79,23 +92,23 @@ const EditUserModal = ({
                     >
                         <TextField
                             label="Name"
-                            onChange={e => setName(e.target.value)}
+                            onChange={e => setFormValue("name", e.target.value)}
                             error={!!formErrors.name}
                             helperText={formErrors.name}
-                            defaultValue={name}
+                            defaultValue={formData.name}
                         />
                         <TextField
                             label="Email"
-                            onChange={e => setEmail(e.target.value)}
+                            onChange={e => setFormValue("email", e.target.value)}
                             error={!!formErrors.email}
                             helperText={formErrors.email}
-                            defaultValue={email}
+                            defaultValue={formData.email}
                         />
                         <FormControlLabel
                             label="Is admin"
                             control={<Checkbox
-                                checked={isAdmin}
-                                onChange={event => setIsAdmin(event.target.checked)}
+                                checked={formData.isAdmin}
+                                onChange={event => setFormValue("isAdmin", event.target.checked)}
                             />}
                         />
                         <Button
