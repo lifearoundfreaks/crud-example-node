@@ -1,0 +1,20 @@
+.placeholderBox {
+    flex-grow: 1;
+}
+
+.menuItems {
+    margin-right: 2em;
+}
+
+h1 {
+    text-align: center;
+}
+
+.username {
+    margin-left: .5em !important;
+}
+
+.notLoggedInText {
+    margin: 0 0 2em;
+    text-align: center;
+}
