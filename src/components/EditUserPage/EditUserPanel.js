@@ -9,6 +9,7 @@ import { useClientAPI } from "../../hooks"
 import { useNavigate } from "react-router-dom"
 import { useDispatch } from 'react-redux'
 import { clearUser } from "../LoggedUser/slice"
+import { useRoutes } from "../../hooks/useRoutes"
 import style from './styles.module.css'
 
 const EditUserPanel = ({ userData, setLoading, openEditModal }) => {
@@ -16,14 +17,15 @@ const EditUserPanel = ({ userData, setLoading, openEditModal }) => {
     const { deleteUser } = useClientAPI()
     const navigate = useNavigate()
     const dispatch = useDispatch()
+    const { routePaths } = useRoutes()
 
     const handleDelete = () => {
         setLoading(true)
         deleteUser(userData.id).then(data => {
             if (data.logOut) {
                 dispatch(clearUser())
-                navigate('/')
-            } else navigate('/users')
+                navigate(routePaths.home)
+            } else navigate(routePaths.users)
         })
     }
 

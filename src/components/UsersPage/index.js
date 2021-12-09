@@ -9,6 +9,7 @@ import {
 import { useEffect, useState } from "react"
 import { useClientAPI } from '../../hooks'
 import { Link } from "react-router-dom"
+import { useRoutes } from "../../hooks/useRoutes"
 import style from './styles.module.css'
 
 const UsersPage = () => {
@@ -16,6 +17,7 @@ const UsersPage = () => {
     const [loading, setLoading] = useState(true)
     const [usersData, setUsersData] = useState([])
     const { getUsers } = useClientAPI()
+    const { routePaths } = useRoutes()
 
     useEffect(() => getUsers().then(data => {
         setUsersData(data)
@@ -28,7 +30,7 @@ const UsersPage = () => {
             {usersData.map(user => <Grid item xs={6} md={3}><Card className={style.card}>
                 <CardContent
                     component={Link}
-                    to={`/user/${user.id}`}
+                    to={routePaths.editUser.replace('\:id', user.id)}
                 >
                     <Stack spacing={2}>
                         <Typography variant="h5" className={style.cardSimpleText}>

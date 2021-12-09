@@ -15,6 +15,7 @@ import {
     selectLoggedUser,
 } from "../LoggedUser/slice"
 import { useClientAPI } from "../../hooks"
+import { useRoutes } from "../../hooks/useRoutes"
 
 const LoginForm = () => {
 
@@ -26,6 +27,7 @@ const LoginForm = () => {
     const user = useSelector(selectLoggedUser)
     const navigate = useNavigate()
     const dispatch = useDispatch()
+    const { routePaths } = useRoutes()
 
     const initialValidation = () => {
         const formErrors = {}
@@ -41,7 +43,7 @@ const LoginForm = () => {
             logIn(email, password).then(data => {
                 if (data.name) {
                     dispatch(setUser(data))
-                    navigate("/")
+                    navigate(routePaths.home)
                 }
                 else {
                     dispatch(clearUser())
@@ -77,7 +79,7 @@ const LoginForm = () => {
             <Button
                 variant="outlined"
                 size="large"
-                to="/register"
+                to={routePaths.register}
                 component={Link}
             >Sign Up</Button>
         </Stack></FormControl>

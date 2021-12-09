@@ -13,6 +13,7 @@ import { useClientAPI } from "../../hooks"
 import { useNavigate } from "react-router-dom"
 import { useDispatch } from 'react-redux'
 import { clearUser } from "../LoggedUser/slice"
+import { useRoutes } from "../../hooks/useRoutes"
 import style from './styles.module.css'
 
 const EditUserModal = ({
@@ -30,6 +31,7 @@ const EditUserModal = ({
 
     const navigate = useNavigate()
     const dispatch = useDispatch()
+    const { routePaths } = useRoutes()
 
     const { updateUser } = useClientAPI()
 
@@ -53,8 +55,8 @@ const EditUserModal = ({
             ).then(data => {
                 if (data.logOut) {
                     dispatch(clearUser())
-                    navigate('/')
-                } else navigate('/users')
+                    navigate(routePaths.home)
+                } else navigate(routePaths.users)
             })
         }
     }

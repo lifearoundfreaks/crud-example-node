@@ -4,6 +4,7 @@ import styles from './styles.module.css'
 import { useClientAPI } from "../../hooks"
 import { useSelector, useDispatch } from 'react-redux'
 import { setLoading, clearUser, selectLoggedUser } from "../LoggedUser/slice"
+import { useRoutes } from "../../hooks/useRoutes"
 
 const LogOutButton = () => {
 
@@ -11,12 +12,13 @@ const LogOutButton = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const user = useSelector(selectLoggedUser)
+    const { routePaths } = useRoutes()
 
     const handleClick = () => {
         dispatch(setLoading())
         logOut().then(() => {
             dispatch(clearUser())
-            navigate("/")
+            navigate(routePaths.home)
         })
     }
 

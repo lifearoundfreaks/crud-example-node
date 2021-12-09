@@ -16,10 +16,12 @@ import NotLoggedInBox from '../NotLoggedInBox'
 import PersonPinCircleIcon from '@mui/icons-material/PersonPinCircle'
 import BarChartIcon from '@mui/icons-material/BarChart'
 import GroupIcon from '@mui/icons-material/Group'
+import { useRoutes } from "../../hooks/useRoutes"
 
 const UserInterface = ({ children }) => {
 
     const user = useSelector(selectLoggedUser)
+    const { routePaths } = useRoutes()
 
     return user.loading ? <CenteredBox><CircularProgress /></CenteredBox> :
         user.loggedIn ? <><AppBar position="static">
@@ -32,19 +34,19 @@ const UserInterface = ({ children }) => {
                         <Button
                             color="inherit"
                             component={Link}
-                            to="/"
+                            to={routePaths.home}
                             startIcon={<PersonPinCircleIcon />}
                         >Profiles</Button>
                         <Button
                             color="inherit"
                             component={Link}
-                            to="/dashboard"
+                            to={routePaths.dashboard}
                             startIcon={<BarChartIcon />}
                         >Dashboard</Button>
                         <Button
                             color="inherit"
                             component={Link}
-                            to="/users"
+                            to={routePaths.users}
                             startIcon={<GroupIcon />}
                         >Users</Button>
                     </Stack> : null}

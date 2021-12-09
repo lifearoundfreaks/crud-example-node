@@ -3,10 +3,12 @@ import { Link } from "react-router-dom"
 import styles from './styles.module.css'
 import { useSelector } from 'react-redux'
 import { selectLoggedUser } from "../LoggedUser/slice"
+import { useRoutes } from "../../hooks/useRoutes"
 
 const NotLoggedInBox = () => {
 
     const user = useSelector(selectLoggedUser)
+    const { routePaths } = useRoutes()
 
     return user.loading ? <CircularProgress /> : <>
         <p className={styles.notLoggedInText}>Currently not logged in.</p>
@@ -14,13 +16,13 @@ const NotLoggedInBox = () => {
             <Button
                 variant="contained"
                 size="large"
-                to="/register"
+                to={routePaths.register}
                 component={Link}
             >Sign up</Button>
             <Button
                 variant="outlined"
                 size="large"
-                to="/login"
+                to={routePaths.login}
                 component={Link}
             >Sign in</Button>
         </Stack>

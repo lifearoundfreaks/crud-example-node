@@ -17,6 +17,7 @@ import {
     selectLoggedUser,
 } from "../LoggedUser/slice"
 import { useClientAPI } from "../../hooks"
+import { useRoutes } from "../../hooks/useRoutes"
 
 const RegisterForm = () => {
 
@@ -26,6 +27,7 @@ const RegisterForm = () => {
     const [passwordRepeat, setPasswordRepeat] = useState("")
     const [isAdmin, setIsAdmin] = useState(false)
     const [formErrors, setFormErrors] = useState({})
+    const { routePaths } = useRoutes()
 
     const { registerUser } = useClientAPI()
     const user = useSelector(selectLoggedUser)
@@ -64,7 +66,7 @@ const RegisterForm = () => {
                 }
                 else {
                     dispatch(setUser(data))
-                    navigate("/")
+                    navigate(routePaths.home)
                 }
             })
         }
@@ -113,7 +115,7 @@ const RegisterForm = () => {
             <Button
                 variant="outlined"
                 size="large"
-                to="/login"
+                to={routePaths.login}
                 component={Link}
             >Sign in</Button>
         </Stack></FormControl>
