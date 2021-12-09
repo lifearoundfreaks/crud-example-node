@@ -1,6 +1,8 @@
 import { Typography, Stack } from '@mui/material'
 import { useSelector } from 'react-redux'
 import { selectLoggedUser } from "../LoggedUser/slice"
+import avatar from '../../../assets/png/avatar.png'
+import adminAvatar from '../../../assets/png/adminAvatar.png'
 import style from './styles.module.css'
 
 const UserCredentials = () => {
@@ -8,7 +10,7 @@ const UserCredentials = () => {
     const user = useSelector(selectLoggedUser)
 
     return <>
-        <img src={process.env.PUBLIC_URL + (user.isAdmin ? '/adminAvatar.png' : '/avatar.png')} />
+        <img src={user.isAdmin ? adminAvatar : avatar} />
         <Typography
             variant="h6"
             noWrap
