@@ -5,11 +5,11 @@ import {
 } from "@mui/material"
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { useClientAPI } from "../../../hooks"
+import { useClientAPI } from "../../hooks"
 import { useNavigate } from "react-router-dom"
 import { useDispatch } from 'react-redux'
-import { clearUser } from "../../CoreFunctionality/LoggedUser/slice"
-import { useRoutes } from "../../../hooks/useRoutes"
+import { clearUser } from "../../components/coreFunctionality/LoggedUser/slice"
+import { useRoutes } from "../../hooks/useRoutes"
 import style from './styles.module.css'
 
 const EditUserPanel = ({ userData, setLoading, openEditModal }) => {

@@ -7,9 +7,9 @@ import {
     Stack,
 } from "@mui/material"
 import { useEffect, useState } from "react"
-import { useClientAPI } from '../../../hooks'
+import { useClientAPI } from '../../hooks'
 import { Link } from "react-router-dom"
-import { useRoutes } from "../../../hooks/useRoutes"
+import { useRoutes } from "../../hooks/useRoutes"
 import style from './styles.module.css'
 
 const UsersPage = () => {

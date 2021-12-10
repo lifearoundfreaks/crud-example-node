@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material"
 import { useEffect, useState } from "react"
-import { ProfileEditor } from "../.."
-import { useClientAPI } from '../../../hooks'
+import { ProfileEditor } from "../../components"
+import { useClientAPI } from '../../hooks'
 import style from './styles.module.css'
 
 const ProfilesPage = () => {

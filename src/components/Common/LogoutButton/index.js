@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import styles from './styles.module.css'
 import { useClientAPI } from "../../../hooks"
 import { useSelector, useDispatch } from 'react-redux'
-import { setLoading, clearUser, selectLoggedUser } from "../../CoreFunctionality/LoggedUser/slice"
+import { setLoading, clearUser, selectLoggedUser } from "../../coreFunctionality/LoggedUser/slice"
 import { useRoutes } from "../../../hooks/useRoutes"
 
 const LogoutButton = () => {

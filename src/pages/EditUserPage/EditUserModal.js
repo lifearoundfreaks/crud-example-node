@@ -9,11 +9,11 @@ import {
     Checkbox,
 } from "@mui/material"
 import { useState } from "react"
-import { useClientAPI } from "../../../hooks"
+import { useClientAPI } from "../../hooks"
 import { useNavigate } from "react-router-dom"
 import { useDispatch } from 'react-redux'
-import { clearUser } from "../../CoreFunctionality/LoggedUser/slice"
-import { useRoutes } from "../../../hooks/useRoutes"
+import { clearUser } from "../../components/coreFunctionality/LoggedUser/slice"
+import { useRoutes } from "../../hooks/useRoutes"
 import style from './styles.module.css'
 
 const REQUIRED_FIELDS = [

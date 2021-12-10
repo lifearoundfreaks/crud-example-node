@@ -5,7 +5,7 @@ import {
     DashboardPage,
     UsersPage,
     EditUserPage,
-} from "../components"
+} from "../pages"
 
 export const useRoutes = () => {
 

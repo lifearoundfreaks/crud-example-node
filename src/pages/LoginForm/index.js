@@ -11,9 +11,9 @@ import {
     setUser,
     clearUser,
     selectLoggedUser,
-} from "../../CoreFunctionality/LoggedUser/slice"
-import { useClientAPI } from "../../../hooks"
-import { useRoutes } from "../../../hooks/useRoutes"
+} from "../../components/coreFunctionality/LoggedUser/slice"
+import { useClientAPI } from "../../hooks"
+import { useRoutes } from "../../hooks/useRoutes"
 import {
     object as yupObject,
     string,
@@ -21,7 +21,7 @@ import {
 import {
     ValidatedTextField as TextField,
     SubmitButton,
-} from "../.."
+} from "../../components"
 import { Formik } from "formik"
 
 const INITIAL_VALUES = {

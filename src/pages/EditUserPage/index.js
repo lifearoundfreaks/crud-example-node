@@ -1,8 +1,8 @@
 import { useParams } from 'react-router'
 import { CircularProgress } from "@mui/material"
 import { useEffect, useState } from "react"
-import { ProfileEditor } from "../.."
-import { useClientAPI } from '../../../hooks'
+import { ProfileEditor } from "../../components"
+import { useClientAPI } from '../../hooks'
 import EditUserPanel from './EditUserPanel'
 import EditUserModal from './EditUserModal'
 import style from './styles.module.css'
