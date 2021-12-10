@@ -2,6 +2,9 @@
 export { default as ProfileEditor } from './Common/ProfileEditor'
 export { default as CenteredBox } from './Common/CenteredBox'
 export { default as LogoutButton } from './Common/LogoutButton'
+export { default as ValidatedTextField } from './Common/ValidatedTextField'
+export { default as SubmitButton } from './Common/SubmitButton'
+export { default as FormCheckbox } from './Common/FormCheckbox'
 
 export { default as LoginForm } from './Pages/LoginForm'
 export { default as RegisterForm } from './Pages/RegisterForm'

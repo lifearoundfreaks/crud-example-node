@@ -1,12 +1,10 @@
 import {
     Button,
     Stack,
-    TextField,
     CircularProgress,
     FormControl,
 } from "@mui/material"
 import { Link, useNavigate } from "react-router-dom"
-import { useState } from "react"
 import { useSelector, useDispatch } from 'react-redux'
 import {
     setLoading,
@@ -16,19 +14,28 @@ import {
 } from "../../CoreFunctionality/LoggedUser/slice"
 import { useClientAPI } from "../../../hooks"
 import { useRoutes } from "../../../hooks/useRoutes"
+import {
+    object as yupObject,
+    string,
+} from 'yup'
+import {
+    ValidatedTextField as TextField,
+    SubmitButton,
+} from "../.."
+import { Formik } from "formik"
 
-const REQUIRED_FIELDS = [
-    'email',
-    'password',
-]
+const INITIAL_VALUES = {
+    email: "",
+    password: "",
+}
+
+const FORM_VALIDATION = yupObject().shape({
+    email: string().email("Invalid email address.").required("This field is required."),
+    password: string().required("This field is required."),
+})
 
 const LoginForm = () => {
 
-    const [formData, setFormData] = useState({
-        email: "",
-        password: "",
-    })
-    const [formErrors, setFormErrors] = useState({})
     const { logIn } = useClientAPI()
 
     const user = useSelector(selectLoggedUser)
@@ -36,68 +43,42 @@ const LoginForm = () => {
     const dispatch = useDispatch()
     const { routePaths } = useRoutes()
 
-    const setFormValue = (field, value) => setFormData({ ...formData, [field]: value })
-
-    const gerFieldRequiredErrors = () => Object.fromEntries(REQUIRED_FIELDS.filter(
-        requiredField => !formData[requiredField]
-    ).map(requiredField => [
-        requiredField, "This field is required."
-    ]))
-
-    const initialValidation = () => {
-        const formErrors = gerFieldRequiredErrors()
-        setFormErrors(formErrors)
-        return !Object.keys(formErrors).length
-    }
-
     const getServerErrors = error => error === "No such user." ?
         { email: error } : { password: error }
 
-    const handleClick = () => {
-        if (initialValidation()) {
-            dispatch(setLoading())
-            logIn(formData.email, formData.password).then(data => {
-                if (data.name) {
-                    dispatch(setUser(data))
-                    navigate(routePaths.home)
-                }
-                else {
-                    dispatch(clearUser())
-                    setFormErrors(getServerErrors(data.error))
-                }
-            })
-        }
+    const handleSubmit = ({ email, password }, { setErrors }) => {
+        dispatch(setLoading())
+        logIn(email, password).then(data => {
+            if (data.name) {
+                dispatch(setUser(data))
+                navigate(routePaths.home)
+            }
+            else {
+                dispatch(clearUser())
+                setErrors(getServerErrors(data.error))
+            }
+        })
     }
 
-    return user.loading ? <CircularProgress /> : <Stack
-        component="form"
-        spacing={2}
-    >
-        <TextField
-            label="Email"
-            onChange={e => setFormValue("email", e.target.value)}
-            error={!!formErrors.email}
-            helperText={formErrors.email}
-            value={formData.email}
-        />
-        <TextField
-            label="Password"
-            type="password"
-            onChange={e => setFormValue("password", e.target.value)}
-            error={!!formErrors.password}
-            helperText={formErrors.password}
-            value={formData.password}
-        />
-        <FormControl><Stack spacing={2} direction="row">
-            <Button variant="contained" size="large" onClick={handleClick}>Sign in</Button>
-            <Button
-                variant="outlined"
-                size="large"
-                to={routePaths.register}
-                component={Link}
-            >Sign Up</Button>
-        </Stack></FormControl>
-    </Stack>
+    return <Formik
+        initialValues={INITIAL_VALUES}
+        validationSchema={FORM_VALIDATION}
+        onSubmit={handleSubmit}
+    >{user.loading ? <CircularProgress /> :
+        <Stack component="form" spacing={2}>
+            <TextField label="Email" name="email" />
+            <TextField label="Password" name="password" type="password" />
+            <FormControl><Stack spacing={2} direction="row">
+                <SubmitButton variant="contained" size="large">Sign in</SubmitButton>
+                <Button
+                    variant="outlined"
+                    size="large"
+                    to={routePaths.register}
+                    component={Link}
+                >Sign Up</Button>
+            </Stack></FormControl>
+        </Stack>}
+    </Formik>
 }
 
 export default LoginForm
